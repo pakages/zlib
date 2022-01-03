@@ -26,7 +26,7 @@ jobs:
           user: ${{ github.actor }}
           token: ${{ secrets.GITHUB_TOKEN }}
           uri: ghcr.io/pakages
-        run: 
+        run: |
           docker run --entrypoint /entrypoint.sh \
                      --env deploy=${deploy} \
                      --env package=${package} \
