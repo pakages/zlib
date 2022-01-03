@@ -2,7 +2,7 @@
 
 Built with paks!
 
-![https://avatars.githubusercontent.com/u/96929375?s=400&u=16e13962702ceff384581f87f677df44d1fece08&v=4](https://avatars.githubusercontent.com/u/96929375?s=400&u=16e13962702ceff384581f87f677df44d1fece08&v=4)
+![https://raw.githubusercontent.com/syspack/paks/main/docs/assets/img/paks.png](https://raw.githubusercontent.com/syspack/paks/main/docs/assets/img/paks.png)
 
 > This is a [paks](https://github.com/syspack/paks) repository, meaning the builds are run automatically via the package file here.
 
