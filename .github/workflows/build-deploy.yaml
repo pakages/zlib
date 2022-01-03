@@ -20,7 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
+      - name: lscpu
+        run: lscpu
       - name: Build Package
         env:
           deploy: ${{ github.event_name != 'pull_request' }}
