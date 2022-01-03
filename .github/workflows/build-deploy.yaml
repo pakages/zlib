@@ -28,6 +28,8 @@ jobs:
           uri: ghcr.io/pakages
         run: |
           docker run --entrypoint /entrypoint.sh \
+                     --workdir /github/workspace \
+                     -v $PWD:/github/workspace \
                      --env deploy=${deploy} \
                      --env package=${package} \
                      --env user=${user} \
