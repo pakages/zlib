@@ -1,5 +1,6 @@
 name: Paks Build and Deploy
 on:
+  workflow_dispatch: []
   pull_request: []
   push:
     branches:
@@ -20,10 +21,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
       - name: Build Package
         env:
-          deploy: ${{ github.event_name != 'pull_request' }}
+          #deploy: ${{ github.event_name != 'pull_request' }}
+          deploy: true
           package: .
           user: ${{ github.actor }}
           token: ${{ secrets.GITHUB_TOKEN }}
