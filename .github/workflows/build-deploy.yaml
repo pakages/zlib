@@ -1,5 +1,6 @@
 name: Paks Build and Deploy
 on:
+  workflow_dispatch: []
   pull_request: []
   push:
     branches:
@@ -15,6 +16,7 @@ jobs:
         container: [["18.04"], ["20.04"], ["22.04"]]
 
     runs-on: ubuntu-latest
+    container: ghcr.io/syspack/paks-ubuntu-${{ matrix.container[0] }}:latest
     name: Paks Build
     steps:
       - name: Checkout
@@ -26,11 +28,4 @@ jobs:
           user: ${{ github.actor }}
           token: ${{ secrets.GITHUB_TOKEN }}
           uri: ghcr.io/pakages
-        run: |
-          docker run --entrypoint /entrypoint.sh \
-                     --workdir /github/workspace \
-                     -v $PWD:/github/workspace \
-                     --env deploy=${deploy} \
-                     --env package=${package} \
-                     --env user=${user} \
-                     --env token=${token} ghcr.io/syspack/paks-ubuntu-${{ matrix.container[0] }}:latest
+        run: /entrypoint.sh 
