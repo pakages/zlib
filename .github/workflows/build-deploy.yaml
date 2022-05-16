@@ -26,6 +26,7 @@ jobs:
 
       - name: Determine if commit done today
         run: |
+          git config --global --add safe.directory /github/workspace
           lastrun=$(git show -s --format=%ci)
           lastrun=("${lastrun}")
           lastrun=${lastrun[0]}
