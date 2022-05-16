@@ -2,6 +2,8 @@ name: Pakages Build and Deploy
 on:
   workflow_dispatch:
   pull_request: []
+  schedule:
+   - cron:  '0 4 * * *'
   push:
     branches:
       - main 
@@ -17,11 +19,26 @@ jobs:
 
     runs-on: ubuntu-latest
     container: ghcr.io/syspack/pakages-ubuntu-${{ matrix.container[0] }}:latest
-    name: Paks Build
+    name: Pakages Build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Determine if commit done today
+        run: |
+          lastrun=($(git show -s --format=%ci))
+          lastrun=${lastrun[0]}
+          today=$(date '+%Y-%m-%d')
+          if [[ "${lastrun}" == "${today}" ]]; then
+            printf "Last commit was today, we have a new commit to build.\n"
+            echo "continue=yes" >> $GITHUB_ENV          
+          else
+            printf "Last commit was not today, no new build.\n"
+            echo "continue=no" >> $GITHUB_ENV 
+          fi
+          
       - name: Build Package
+        if: (github.env.continue == "yes")
         env:
           deploy: ${{ github.event_name != 'pull_request' }}
           package: .
