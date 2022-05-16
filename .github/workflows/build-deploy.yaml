@@ -24,9 +24,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      #- if: (github.event.name == 'scheduled')
       - name: Determine if commit done today
+        env:
+          package_name: ${{ github.event.repository.name }}
         run: |
-          git config --global --add safe.directory /github/workspace
+          git config --global --add safe.directory /__w/$package_name/$package_name
           lastrun=$(git show -s --format=%ci)
           lastrun=("${lastrun}")
           lastrun=${lastrun[0]}
@@ -38,7 +41,10 @@ jobs:
             printf "Last commit was not today, no new build.\n"
             echo "continue=no" >> $GITHUB_ENV 
           fi
-          
+
+      #- if: (github.event.name != 'scheduled')
+      #  run: echo "continue=yes" >> $GITHUB_ENV          
+
       - name: Build Package
         if: (github.env.continue == 'yes')
         env:
