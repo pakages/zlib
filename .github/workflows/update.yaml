@@ -1,11 +1,10 @@
-name: Pakages
+name: Pakages Update
 on:
-  pull_request: []
   schedule:
    - cron:  '0 2 * * *'
-
+ 
 jobs:
-  update:
+  check:
     runs-on: ubuntu-latest
     container: ghcr.io/syspack/pakages-ubuntu-${{ matrix.container[0] }}:latest
     name: Pakages Update
@@ -21,21 +20,21 @@ jobs:
            mv /tmp/spack/var/spack/repos/builtin/packages/${package_name} packages/${package_name}
            git add packages/${package_name}
 
-    - name: Push Changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        printf "GitHub Actor: ${GITHUB_ACTOR}\n"
-        git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-        git branch
+      - name: Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf "GitHub Actor: ${GITHUB_ACTOR}\n"
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git branch
 
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@users.noreply.github.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@users.noreply.github.com"
 
-        if git diff-index --quiet HEAD --; then
-           printf "No changes\n"
-        else
-           printf "Changes\n"
-           git commit -m "Automated deployment to update pakage $(date '+%Y-%m-%d')"
-           git push origin main
-        fi
+          if git diff-index --quiet HEAD --; then
+             printf "No changes\n"
+          else
+             printf "Changes\n"
+             git commit -m "Automated deployment to update pakage $(date '+%Y-%m-%d')"
+             git push origin main
+          fi
