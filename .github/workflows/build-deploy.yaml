@@ -2,12 +2,46 @@ name: Pakages Build and Deploy
 on:
   workflow_dispatch:
   pull_request: []
+  schedule:
+   - cron:  '0 4 * * *'
   push:
     branches:
       - main 
  
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Pakages Check
+    outputs:
+      continue: ${{ steps.check.outputs.continue }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Determine if commit done today
+        id: check
+        env:
+          package_name: ${{ github.event.repository.name }}
+          event_name: ${{ github.event.name }}
+        run: |
+          if [[ "${event_name}" != "scheduled" ]]; then
+              echo '::set-output name=continue::yes'          
+          else
+              lastrun=$(git show -s --format=%ci)
+              lastrun=$(python -c "print('${lastrun}'.split(' ')[0])")
+              today=$(date '+%Y-%m-%d')
+              printf "Comparing last run ${lastrun} with ${today}\n"
+              if [[ "${lastrun}" == "${today}" ]]; then
+                  printf "Last commit was today, we have a new commit to build.\n"
+                  echo '::set-output name=continue::yes'
+              else
+                  printf "Last commit was not today, no new build.\n"
+                  echo '::set-output name=continue::no'
+              fi
+           fi
+
   build:
+    needs: check
     permissions:
       packages: write
     strategy:
@@ -17,11 +51,14 @@ jobs:
 
     runs-on: ubuntu-latest
     container: ghcr.io/syspack/pakages-ubuntu-${{ matrix.container[0] }}:latest
-    name: Paks Build
+    if: ${{ needs.check.outputs.continue == 'yes' }}
+    name: Pakages Build
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Build Package
+        if: (github.env.continue == 'yes')
         env:
           deploy: ${{ github.event_name != 'pull_request' }}
           package: .
