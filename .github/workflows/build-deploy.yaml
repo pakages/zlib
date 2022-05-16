@@ -28,18 +28,16 @@ jobs:
               echo '::set-output name=continue::yes'          
           else
               lastrun=$(git show -s --format=%ci)
-              for entry in $lastrun; do         
-                today=$(date '+%Y-%m-%d')
-                printf "Comparing last run ${lastrun} with ${today}\n"
-                if [[ "${lastrun}" == "${today}" ]]; then
+              lastrun=$(python -c "'${lastrun}'.split(' ')[0]")
+              today=$(date '+%Y-%m-%d')
+              printf "Comparing last run ${lastrun} with ${today}\n"
+              if [[ "${lastrun}" == "${today}" ]]; then
                   printf "Last commit was today, we have a new commit to build.\n"
                   echo '::set-output name=continue::yes'
-                else
+              else
                   printf "Last commit was not today, no new build.\n"
                   echo '::set-output name=continue::no'
-                fi
-                break
-              done
+              fi
            fi
 
   build:

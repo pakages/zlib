@@ -7,7 +7,6 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    container: ghcr.io/syspack/pakages-ubuntu-${{ matrix.container[0] }}:latest
     name: Pakages Update
     steps:
       - name: Checkout
