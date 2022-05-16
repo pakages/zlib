@@ -38,7 +38,7 @@ jobs:
           fi
           
       - name: Build Package
-        if: (github.env.continue == "yes")
+        if: (github.env.continue == 'yes')
         env:
           deploy: ${{ github.event_name != 'pull_request' }}
           package: .
