@@ -24,7 +24,7 @@ jobs:
           package_name: ${{ github.event.repository.name }}
           event_name: ${{ github.event.name }}
         run: |
-          if [[ "${event_name}" != "scheduled" ]]; then
+          if [[ "${event_name}" == "scheduled" ]]; then
               echo '::set-output name=continue::yes'          
           else
               lastrun=$(git show -s --format=%ci)
