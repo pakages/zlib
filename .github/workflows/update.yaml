@@ -1,0 +1,57 @@
+name: Pakages Build and Deploy
+on:
+  pull_request: []
+  schedule:
+   - cron:  '5 4 * * *'
+
+jobs:
+  build:
+    permissions:
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        container: [["20.04"], ["22.04"]]
+
+    runs-on: ubuntu-latest
+    container: ghcr.io/syspack/pakages-ubuntu-${{ matrix.container[0] }}:latest
+    name: Paks Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name:  Update Package
+        env:
+          package_name: ${{ github.event.repository.name }}
+        run: |
+           git clone --depth 1 https://github.com/spack/spack /tmp/spack
+           rm -rf packages/${package_name}/
+           mv /tmp/spack/var/spack/repos/builtin/packages/${package_name} packages/${package_name}
+           git add packages/${package_name}
+
+    - name: Push Changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        printf "GitHub Actor: ${GITHUB_ACTOR}\n"
+        git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        git branch
+
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@users.noreply.github.com"
+
+        if git diff-index --quiet HEAD --; then
+           printf "No changes\n"
+        else
+           printf "Changes\n"
+           git commit -m "Automated deployment to update pakage $(date '+%Y-%m-%d')"
+           git push origin main
+        fi
+
+      - name: Build Package
+        env:
+          deploy: ${{ github.event_name != 'pull_request' }}
+          package: .
+          user: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          uri: ghcr.io/pakages
+        run: /entrypoint.sh
