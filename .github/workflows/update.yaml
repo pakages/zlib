@@ -1,4 +1,4 @@
-name: Pakages Update
+name: Pakages
 on:
   pull_request: []
   schedule:
